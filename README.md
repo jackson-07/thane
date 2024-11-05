@@ -18,7 +18,8 @@ In the new window, try Ctrl+Shift+P (or Cmd+Shift+P on Mac) and type any of thes
 
 - Add Action
 - Show Actions
-- Start Timer for Action
+- Complete Action
+- Start Timer
 - Stop Timer
 - Convert Action to Issue
 - Add Issue
