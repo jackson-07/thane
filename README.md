@@ -2,11 +2,15 @@
 
 Version one of a VS code extension built for productivity in TypeScript. I am using webpack as a build tool so to run:
 
+```
 npm run compile
+```
 
 Then:
 
+```
 npm run watch
+```
 
 Followed Press F5 or Run > 'Start Debugging' to open the Extension Development Host
 

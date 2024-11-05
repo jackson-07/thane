@@ -21,8 +21,12 @@
         "title": "Show Actions"
       },
       {
+        "command": "actionmanager.completeAction",
+        "title": "Complete Action"
+      },
+      {
         "command": "actionmanager.startTimer",
-        "title": "Start Timer for Action"
+        "title": "Start Timer"
       },
       {
         "command": "actionmanager.stopTimer",

@@ -21,12 +21,15 @@ export function activate(context: vscode.ExtensionContext) {
 
     let addActionCommand = vscode.commands.registerCommand('actionmanager.addAction', addAction);
     let showActionsCommand = vscode.commands.registerCommand('actionmanager.showActions', showActions);
+    let completeActionCommand = vscode.commands.registerCommand('actionmanager.completeAction', completeAction);
+
     let startTimerCommand = vscode.commands.registerCommand('actionmanager.startTimer', startTimer);
     let stopTimerCommand = vscode.commands.registerCommand('actionmanager.stopTimer', stopTimer);
+
     let convertToIssueCommand = vscode.commands.registerCommand('actionmanager.convertToIssue', convertToIssue);
     let addIssueCommand = vscode.commands.registerCommand('actionmanager.addIssue', addIssue);
 
-    context.subscriptions.push(addActionCommand, showActionsCommand, startTimerCommand, stopTimerCommand, convertToIssueCommand, addIssueCommand);
+    context.subscriptions.push(addActionCommand, showActionsCommand, completeActionCommand, startTimerCommand, stopTimerCommand, convertToIssueCommand, addIssueCommand);
 }
 
 async function addAction() {
@@ -53,6 +56,60 @@ async function showActions() {
     const selectedAction = await vscode.window.showQuickPick(actionItems, { canPickMany: false });
     if (selectedAction) {
         vscode.window.showInformationMessage(`Selected: ${selectedAction.label}`);
+    }
+}
+
+async function completeAction() {
+    if (actions.length === 0) {
+        vscode.window.showInformationMessage('No actions yet.');
+        return;
+    }
+
+    const actionItems = actions.map((action, index) => ({
+        label: `${index + 1}. ${action.isIssue ? '[ISSUE] ' : ''}${action.description}`,
+        description: action.timer ? `${action.timer} minutes` : '',
+        action: action
+    }));
+
+    const selectedAction = await vscode.window.showQuickPick(actionItems, { canPickMany: false });
+    if (selectedAction) {
+        if (selectedAction.action.timerInterval) {
+            clearInterval(selectedAction.action.timerInterval);
+            statusBarItem.hide();
+        }
+
+        if (selectedAction.action.isIssue && selectedAction.action.filePath && selectedAction.action.lineNumber !== undefined) {
+            try {
+                const document = await vscode.workspace.openTextDocument(selectedAction.action.filePath);
+                const edit = new vscode.WorkspaceEdit();
+                
+                const line = document.lineAt(selectedAction.action.lineNumber);
+                const lineRange = line.range;
+                
+                if (line.text.includes(`// ISSUE: ${selectedAction.action.description}`)) {
+                    edit.delete(document.uri, lineRange);
+                    await vscode.workspace.applyEdit(edit);
+                }
+            } catch (error) {
+                console.error('Error removing issue comment:', error);
+            }
+        }
+
+        const actionIndex = actions.findIndex(a => a === selectedAction.action);
+        if (actionIndex > -1) {
+            actions.splice(actionIndex, 1);
+        }
+
+    
+        vscode.window.showInformationMessage(
+            `Completed: ${selectedAction.action.description}`,
+            'Undo'
+        ).then(selection => {
+            if (selection === 'Undo') {
+                actions.push(selectedAction.action);
+                vscode.window.showInformationMessage('Action restored');
+            }
+        });
     }
 }
 
