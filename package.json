@@ -26,7 +26,7 @@
       },
       {
         "command": "actionmanager.startTimer",
-        "title": "Snmtart Timer"
+        "title": "Start Timer"
       },
       {
         "command": "actionmanager.stopTimer",
