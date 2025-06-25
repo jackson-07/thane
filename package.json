@@ -26,19 +26,15 @@
       },
       {
         "command": "actionmanager.startTimer",
-        "title": "Start Timer"
+        "title": "Snmtart Timer"
       },
       {
         "command": "actionmanager.stopTimer",
         "title": "Stop Timer"
       },
       {
-        "command": "actionmanager.convertToIssue",
-        "title": "Convert Action to Issue"
-      },
-      {
-        "command": "actionmanager.addIssue",
-        "title": "Add Issue"
+        "command": "actionmanager.convertToComment",
+        "title": "Convert Action to Comment"
       }
     ]
   },

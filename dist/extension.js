@@ -43,14 +43,13 @@ function activate(context) {
     let completeActionCommand = vscode.commands.registerCommand('actionmanager.completeAction', completeAction);
     let startTimerCommand = vscode.commands.registerCommand('actionmanager.startTimer', startTimer);
     let stopTimerCommand = vscode.commands.registerCommand('actionmanager.stopTimer', stopTimer);
-    let convertToIssueCommand = vscode.commands.registerCommand('actionmanager.convertToIssue', convertToIssue);
-    let addIssueCommand = vscode.commands.registerCommand('actionmanager.addIssue', addIssue);
-    context.subscriptions.push(addActionCommand, showActionsCommand, completeActionCommand, startTimerCommand, stopTimerCommand, convertToIssueCommand, addIssueCommand);
+    let convertToCommentCommand = vscode.commands.registerCommand('actionmanager.convertToComment', convertToComment);
+    context.subscriptions.push(addActionCommand, showActionsCommand, completeActionCommand, startTimerCommand, stopTimerCommand, convertToCommentCommand);
 }
 async function addAction() {
     const actionDescription = await vscode.window.showInputBox({ prompt: 'Enter a new action' });
     if (actionDescription) {
-        const action = { description: actionDescription, isIssue: false };
+        const action = { description: actionDescription, isComment: false };
         actions.push(action);
         vscode.window.showInformationMessage(`Added action: ${actionDescription}`);
     }
@@ -61,7 +60,7 @@ async function showActions() {
         return;
     }
     const actionItems = actions.map((action, index) => ({
-        label: `${index + 1}. ${action.isIssue ? '[ISSUE] ' : ''}${action.description}`,
+        label: `${index + 1}. ${action.isComment ? '[COMMENT] ' : ''}${action.description}`,
         description: action.timer ? `${action.timer} minutes` : '',
         action: action
     }));
@@ -76,7 +75,7 @@ async function completeAction() {
         return;
     }
     const actionItems = actions.map((action, index) => ({
-        label: `${index + 1}. ${action.isIssue ? '[ISSUE] ' : ''}${action.description}`,
+        label: `${index + 1}. ${action.isComment ? '[COMMENT] ' : ''}${action.description}`,
         description: action.timer ? `${action.timer} minutes` : '',
         action: action
     }));
@@ -86,19 +85,19 @@ async function completeAction() {
             clearInterval(selectedAction.action.timerInterval);
             statusBarItem.hide();
         }
-        if (selectedAction.action.isIssue && selectedAction.action.filePath && selectedAction.action.lineNumber !== undefined) {
+        if (selectedAction.action.isComment && selectedAction.action.filePath && selectedAction.action.lineNumber !== undefined) {
             try {
                 const document = await vscode.workspace.openTextDocument(selectedAction.action.filePath);
                 const edit = new vscode.WorkspaceEdit();
                 const line = document.lineAt(selectedAction.action.lineNumber);
                 const lineRange = line.range;
-                if (line.text.includes(`// ISSUE: ${selectedAction.action.description}`)) {
+                if (line.text.includes(`// COMMENT: ${selectedAction.action.description}`)) {
                     edit.delete(document.uri, lineRange);
                     await vscode.workspace.applyEdit(edit);
                 }
             }
             catch (error) {
-                console.error('Error removing issue comment:', error);
+                console.error('Error removing comment:', error);
             }
         }
         const actionIndex = actions.findIndex(a => a === selectedAction.action);
@@ -166,50 +165,28 @@ async function stopTimer() {
         statusBarItem.hide();
     }
 }
-async function convertToIssue() {
-    const actionItems = actions.filter(action => !action.isIssue).map((action, index) => ({
+async function convertToComment() {
+    const actionItems = actions.filter(action => !action.isComment).map((action, index) => ({
         label: `${index + 1}. ${action.description}`,
         action: action
     }));
     if (actionItems.length === 0) {
-        vscode.window.showInformationMessage('No actions to convert to issues!');
+        vscode.window.showInformationMessage('No actions to convert to comment!');
         return;
     }
     const selectedAction = await vscode.window.showQuickPick(actionItems, { canPickMany: false });
     if (selectedAction) {
-        selectedAction.action.isIssue = true;
-        vscode.window.showInformationMessage(`Action "${selectedAction.action.description}" converted to an issue`);
+        selectedAction.action.isComment = true;
+        vscode.window.showInformationMessage(`Action "${selectedAction.action.description}" converted to an comment`);
         const editor = vscode.window.activeTextEditor;
         if (editor) {
             const position = editor.selection.active;
             const edit = new vscode.WorkspaceEdit();
-            edit.insert(editor.document.uri, position, `// ISSUE: ${selectedAction.action.description}\n`);
+            edit.insert(editor.document.uri, position, `// COMMENT: ${selectedAction.action.description}\n`);
             await vscode.workspace.applyEdit(edit);
             selectedAction.action.filePath = editor.document.uri.fsPath;
             selectedAction.action.lineNumber = position.line;
         }
-    }
-}
-async function addIssue() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        vscode.window.showErrorMessage('No active editor');
-        return;
-    }
-    const issueDescription = await vscode.window.showInputBox({ prompt: 'Enter issue description' });
-    if (issueDescription) {
-        const action = {
-            description: issueDescription,
-            isIssue: true,
-            filePath: editor.document.uri.fsPath,
-            lineNumber: editor.selection.active.line
-        };
-        actions.push(action);
-        const position = editor.selection.active;
-        const edit = new vscode.WorkspaceEdit();
-        edit.insert(editor.document.uri, position, `// ISSUE: ${issueDescription}\n`);
-        await vscode.workspace.applyEdit(edit);
-        vscode.window.showInformationMessage(`Added issue: ${issueDescription}`);
     }
 }
 function deactivate() {
