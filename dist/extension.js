@@ -182,7 +182,7 @@ async function convertToComment() {
         if (editor) {
             const position = editor.selection.active;
             const edit = new vscode.WorkspaceEdit();
-            edit.insert(editor.document.uri, position, `// COMMENT: ${selectedAction.action.description}\n`);
+            edit.insert(editor.document.uri, position, `// TO DO: ${selectedAction.action.description}\n`);
             await vscode.workspace.applyEdit(edit);
             selectedAction.action.filePath = editor.document.uri.fsPath;
             selectedAction.action.lineNumber = position.line;

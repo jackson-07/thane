@@ -22,6 +22,6 @@ In the new window, try Ctrl+Shift+P (or Cmd+Shift+P on Mac) and type any of thes
 - Start Timer
 - Stop Timer
 - Convert Action to Issue
-- Add Issue
+- Convert Action to Comment
 
 Hoping to add improvements and UI before publishing. 

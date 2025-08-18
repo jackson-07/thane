@@ -1,7 +1,7 @@
 {
   "name": "thane",
   "displayName": "thane",
-  "description": "A task management tool for developers that tracks coding tasks, sets timers, manages technical debt and boosts productivity.",
+  "description": "A task management tool for developers that tracks coding tasks, sets timers, manages technical debt and boost productivity.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.93.0"
