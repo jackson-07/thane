@@ -90,14 +90,24 @@ async function completeAction() {
                 const document = await vscode.workspace.openTextDocument(selectedAction.action.filePath);
                 const edit = new vscode.WorkspaceEdit();
                 const line = document.lineAt(selectedAction.action.lineNumber);
-                const lineRange = line.range;
-                if (line.text.includes(`// COMMENT: ${selectedAction.action.description}`)) {
+                const expectedComment = `// TO DO: ${selectedAction.action.description}`;
+                if (line.text.trim() === expectedComment) {
+                    const lineRange = document.lineAt(selectedAction.action.lineNumber).rangeIncludingLineBreak;
                     edit.delete(document.uri, lineRange);
                     await vscode.workspace.applyEdit(edit);
+                }
+                else {
+                    const commentIndex = line.text.indexOf(expectedComment);
+                    if (commentIndex !== -1) {
+                        const range = new vscode.Range(selectedAction.action.lineNumber, commentIndex, selectedAction.action.lineNumber, commentIndex + expectedComment.length);
+                        edit.delete(document.uri, range);
+                        await vscode.workspace.applyEdit(edit);
+                    }
                 }
             }
             catch (error) {
                 console.error('Error removing comment:', error);
+                vscode.window.showWarningMessage('Could not remove comment - file may have been modified');
             }
         }
         const actionIndex = actions.findIndex(a => a === selectedAction.action);
