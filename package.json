@@ -1,69 +1,62 @@
 {
   "name": "thane",
   "displayName": "thane",
-  "description": "A task management tool for developers that tracks coding tasks, sets timers, manages technical debt and boost productivity.",
+  "description": "Task management extension for VSCode",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Other"
   ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "actionmanager.addAction",
-        "title": "Add Action"
+        "command": "thane.addTask",
+        "title": "Thane: Add Task"
       },
       {
-        "command": "actionmanager.showActions",
-        "title": "Show Actions"
+        "command": "thane.showTasks",
+        "title": "Thane: Show Tasks"
       },
       {
-        "command": "actionmanager.completeAction",
-        "title": "Complete Action"
+        "command": "thane.completeTask",
+        "title": "Thane: Complete Task"
       },
       {
-        "command": "actionmanager.startTimer",
-        "title": "Start Timer"
+        "command": "thane.startTimer",
+        "title": "Thane: Start Timer"
       },
       {
-        "command": "actionmanager.stopTimer",
-        "title": "Stop Timer"
+        "command": "thane.stopTimer",
+        "title": "Thane: Stop Timer"
       },
       {
-        "command": "actionmanager.convertToComment",
-        "title": "Convert Action to Comment"
+        "command": "thane.convertToComment",
+        "title": "Thane: Convert to Comment"
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.7",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^8.3.0",
-    "@typescript-eslint/parser": "^8.3.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.9.1",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.5.4",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "jest": "^30.0.5"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.0",
+    "@types/vscode": "^1.103.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^8.56.0",
+    "glob": "^11.0.3",
+    "mocha": "^11.7.1",
+    "typescript": "^5.9.2"
   }
 }
